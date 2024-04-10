@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param } from "@nestjs/common";
 
 import { DogsService } from "./dogs.service";
 
@@ -17,5 +17,13 @@ export class DogsController {
         return {id: generatedId};
     }
 
-    getAllDogs() {}
+    @Get()
+    getAllDogs() {
+        return this.dogsService.getDogs();
+    }
+
+    @Get(':id')
+    getDog(@Param(':id') dogId: string,) {
+        
+    }
 }
