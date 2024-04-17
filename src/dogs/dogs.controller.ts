@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from "@nestjs/common";
+import { Controller, Post, Body, Get, Param, Patch, Delete } from "@nestjs/common";
 
 import { DogsService } from "./dogs.service";
 
@@ -23,7 +23,25 @@ export class DogsController {
     }
 
     @Get(':id')
-    getDog(@Param(':id') dogId: string,) {
-        
+    getDog(@Param(':id') dogId: string) {
+        return this.dogsService.getSingleDog(dogId);
+    }
+
+    @Patch(':id')
+    updateDog(
+        @Param(':id') dogId: string,
+        @Body('breed') dogBreed: string, 
+        @Body('picture') dogPic: string, 
+        @Body('size') dogSize: string, 
+        @Body('fact') dogFact: string
+    ) {
+        this.dogsService.updateDog(dogId, dogBreed, dogPic, dogSize, dogFact);
+        return null;
+    }
+
+    @Delete(':id')
+    removeDog(@Param('id')dogId: string,) {
+        this.dogsService.deleteDog(dogId);
+        return null;
     }
 }
