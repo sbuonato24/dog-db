@@ -17,13 +17,14 @@ export class DogsService {
     }
 
     getSingleDog(dogId: string) {
+        console.log(this.dogs[0]);
         const dog = this.findDog(dogId)[0];
         return { ...dog };
     }
 
     updateDog(dogId: string, breed: string, picture: string, size: string, fact: string) {
         const [dog, index] = this.findDog(dogId);
-        const updatedDog = {...dog};
+        const updatedDog = { ...dog };
         if (breed) {
             updatedDog.breed = breed;
         }
@@ -45,7 +46,7 @@ export class DogsService {
     }
 
     private findDog(id: string): [Dog, number] {
-        const dogIndex = this.dogs.findIndex(dog => dog.id == id);
+        const dogIndex = this.dogs.findIndex(dog => dog.id === id);
         const dog = this.dogs[dogIndex];
         if (!dog) {
             throw new NotFoundException('Could not find dog.');

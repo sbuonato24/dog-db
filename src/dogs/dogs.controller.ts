@@ -23,13 +23,13 @@ export class DogsController {
     }
 
     @Get(':id')
-    getDog(@Param(':id') dogId: string) {
+    getDog(@Param('id') dogId: string) {
         return this.dogsService.getSingleDog(dogId);
     }
 
     @Patch(':id')
     updateDog(
-        @Param(':id') dogId: string,
+        @Param('id') dogId: string,
         @Body('breed') dogBreed: string, 
         @Body('picture') dogPic: string, 
         @Body('size') dogSize: string, 
