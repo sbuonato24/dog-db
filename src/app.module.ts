@@ -5,7 +5,9 @@ import { AppService } from './app.service';
 import { DogsModule } from './dogs/dogs.module';
 
 @Module({
-  imports: [DogsModule],
+  imports: [DogsModule, MongooseModule.forRoot('mongodb+srv://sbuonato24:sbuonato24@cluster0.t1nqkzl.mongodb.net/'
+  )
+],
   controllers: [AppController],
   providers: [AppService],
 })

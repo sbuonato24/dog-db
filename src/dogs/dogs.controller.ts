@@ -7,19 +7,22 @@ export class DogsController {
     constructor(private readonly dogsService: DogsService) {}
     
     @Post()
-    addDog(
+    async addDog(
         @Body('breed') dogBreed: string,
         @Body('picture') dogPic: string, 
         @Body('size') dogSize: string, 
         @Body('fact') dogFact: string,
         ) {
-        const generatedId = this.dogsService.insertDog(dogBreed, dogPic, dogSize, dogFact);
-        return {id: generatedId};
+        const generatedId = await this.dogsService.insertDog(
+            dogBreed, dogPic, dogSize, dogFact
+        );
+        return { id: generatedId };
     }
 
     @Get()
-    getAllDogs() {
-        return this.dogsService.getDogs();
+    async getAllDogs() {
+        const dogs = await this.dogsService.getDogs();
+        return dogs
     }
 
     @Get(':id')
@@ -28,20 +31,20 @@ export class DogsController {
     }
 
     @Patch(':id')
-    updateDog(
+    async updateDog(
         @Param('id') dogId: string,
         @Body('breed') dogBreed: string, 
         @Body('picture') dogPic: string, 
         @Body('size') dogSize: string, 
         @Body('fact') dogFact: string
     ) {
-        this.dogsService.updateDog(dogId, dogBreed, dogPic, dogSize, dogFact);
+        await this.dogsService.updateDog(dogId, dogBreed, dogPic, dogSize, dogFact);
         return null;
     }
 
     @Delete(':id')
-    removeDog(@Param('id')dogId: string,) {
-        this.dogsService.deleteDog(dogId);
+    async removeDog(@Param('id')dogId: string,) {
+        await this.dogsService.deleteDog(dogId);
         return null;
     }
 }

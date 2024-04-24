@@ -1,30 +1,50 @@
 import { Delete, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Dog } from './dog.model';
 
-import { Dog } from './dog.model'
 @Injectable()
 export class DogsService {
     private dogs: Dog[] = [];
 
-    insertDog(breed: string, picture: string, size: string, fact: string) {
-        const dogId = Math.random().toString();
-        const newDog = new Dog(dogId, breed, picture, size, fact);
-        this.dogs.push(newDog);
-        return dogId;
+    constructor(@InjectModel('Dog') private readonly dogModel: Model<Dog>
+) {}
+
+    async insertDog(breed: string, picture: string, size: string, fact: string) {
+        const newDog = new this.dogModel({
+            breed: breed, 
+            picture: picture, 
+            size: size, 
+            fact: fact,
+        });
+        const result = await newDog.save();
+        return result.id as string;
     }
 
-    getDogs() {
-        return [...this.dogs];
+    async getDogs() {
+        const dogs = await this.dogModel.find().exec();
+        return dogs.map((dog) => ({
+            id: dog.id, 
+            breed: dog.breed, 
+            picture: dog.picture, 
+            size: dog.size, 
+            fact: dog.fact
+        }));
     }
 
-    getSingleDog(dogId: string) {
-        console.log(this.dogs[0]);
-        const dog = this.findDog(dogId)[0];
-        return { ...dog };
+    async getSingleDog(dogId: string) {
+        const dog = await this.findDog(dogId);
+        return { 
+            id: dog.id, 
+            breed: dog.breed, 
+            picture: dog.picture, 
+            size: dog.size, 
+            fact: dog.fact,
+        };
     }
 
-    updateDog(dogId: string, breed: string, picture: string, size: string, fact: string) {
-        const [dog, index] = this.findDog(dogId);
-        const updatedDog = { ...dog };
+    async updateDog(dogId: string, breed: string, picture: string, size: string, fact: string) {
+        const updatedDog = await this.findDog(dogId);
         if (breed) {
             updatedDog.breed = breed;
         }
@@ -37,20 +57,26 @@ export class DogsService {
         if (fact) {
             updatedDog.fact = fact;
         }
-        this.dogs[index] = updatedDog;
+        updatedDog.save();
     }
 
-    deleteDog(dogId: string) {
-       const index = this.findDog(dogId)[1];
-       this.dogs.splice(index, 1);
+    async deleteDog(dogId: string) {
+       const result = await this.dogModel.deleteOne({_id: dogId}).exec();
+       if (result.deletedCount === 0) {
+        throw new NotFoundException('Could not find dog.');
+    }
     }
 
-    private findDog(id: string): [Dog, number] {
-        const dogIndex = this.dogs.findIndex(dog => dog.id === id);
-        const dog = this.dogs[dogIndex];
+    private async findDog(id: string): Promise<Dog> {
+        let dog;
+        try{
+        dog = await this.dogModel.findById(id).exec();
+        } catch (error) {
+            throw new NotFoundException('Could not find dog.');
+        }
         if (!dog) {
             throw new NotFoundException('Could not find dog.');
         }
-        return [dog, dogIndex];
+        return dog;
     }
 }
